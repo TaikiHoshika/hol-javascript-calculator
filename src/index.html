@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>電卓アプリ</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .calculator {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 320px;
+        }
+
+        .display {
+            background-color: #eaeaea;
+            border: none;
+            border-radius: 5px;
+            font-size: 2em;
+            padding: 10px;
+            text-align: right;
+            width: calc(100% - 20px); /* Adjust width to fit within the calculator padding */
+            margin-bottom: 10px;
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .button {
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 1.5em;
+            padding: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .button:active {
+            background-color: #004494;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" id="display" class="display" disabled>
+        <div class="buttons">
+            <button class="button">1</button>
+            <button class="button">2</button>
+            <button class="button">3</button>
+            <button class="button">+</button>
+            <button class="button">4</button>
+            <button class="button">5</button>
+            <button class="button">6</button>
+            <button class="button">-</button>
+            <button class="button">7</button>
+            <button class="button">8</button>
+            <button class="button">9</button>
+            <button class="button">*</button>
+            <button class="button">C</button>
+            <button class="button">0</button>
+            <button class="button">=</button>
+            <button class="button">/</button>
+        </div>
+    </div>
+    <script src="app.js"></script>
+    <script lang="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            const result = document.getElementById('display');
+            const buttons = document.querySelectorAll('button');
+            let currentInput = '';
+            let operator = '';
+            let firstOperand = null;
+
+            buttons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const value = this.innerText;
+
+                    if (value === 'C') {
+                        currentInput = '';
+                        operator = '';
+                        firstOperand = null;
+                        result.value = '';
+                    } else if (['+', '-', '*', '/'].includes(value)) {
+                        if (firstOperand === null) {
+                            firstOperand = parseFloat(currentInput);
+                            operator = value;
+                            currentInput = '';
+                        }
+                    } else if (value === '=') {
+                        if (firstOperand !== null && operator !== '' && currentInput !== '') {
+                            const secondOperand = parseFloat(currentInput);
+                            let calculationResult;
+
+                            try {
+                                switch (operator) {
+                                    case '+':
+                                        calculationResult = add(firstOperand, secondOperand);
+                                        break;
+                                    case '-':
+                                        calculationResult = subtract(firstOperand, secondOperand);
+                                        break;
+                                    case '*':
+                                        calculationResult = multiply(firstOperand, secondOperand);
+                                        break;
+                                    case '/':
+                                        calculationResult = divide(firstOperand, secondOperand);
+                                        break;
+                                }
+
+                                if (calculationResult instanceof Error) {
+                                    throw calculationResult;
+                                }
+
+                                result.value = calculationResult;
+                                currentInput = calculationResult.toString();
+                                operator = '';
+                                firstOperand = null;
+                            } catch (error) {
+                                result.value = error.message;
+                                currentInput = '';
+                                operator = '';
+                                firstOperand = null;
+                            }
+                        }
+                    } else {
+                        if (result.value === currentInput) {
+                            currentInput = '';
+                        }
+                        currentInput += value;
+                        result.value = currentInput;
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
